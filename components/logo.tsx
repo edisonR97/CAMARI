@@ -1,0 +1,1 @@
+import Link from "next/link"; export function Logo({light=false}:{light?:boolean}){return <Link href="/" className={`inline-flex items-center gap-2 ${light?"text-white":""}`}><span className="brand-mark"><i>C</i><i>M</i></span><span className="font-serif text-2xl tracking-[.18em]">CAMARI</span></Link>}

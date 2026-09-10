@@ -1,0 +1,1 @@
+import{AdminNav}from"@/components/admin-nav";export default function AdminLayout({children}:{children:React.ReactNode}){return <div style={{display:"grid",gridTemplateColumns:"240px 1fr",minHeight:"80vh"}}><AdminNav/><div style={{padding:"40px clamp(20px,5vw,70px)",minWidth:0}}>{children}</div></div>}

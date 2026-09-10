@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CAMARI — Arte hecho para conectar
 
-## Getting Started
+Tienda administrable construida con Next.js, React, TypeScript, Tailwind CSS y Supabase. El catálogo, precios, inventario, fotos y configuración se obtienen de Supabase; los datos demo solo viven en `supabase/seed.sql`.
 
-First, run the development server:
+## Instalación
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Usa Node.js 20.9 o posterior y ejecuta `npm install`.
+2. Crea un proyecto en Supabase.
+3. En SQL Editor ejecuta en orden `supabase/schema.sql`, `supabase/rls.sql`, `supabase/storage.sql` y, opcionalmente, `supabase/seed.sql`.
+4. Copia `.env.example` como `.env.local` y completa la URL y clave pública anon de Project Settings → API.
+5. Ejecuta `npm run dev` y abre `http://localhost:3000`.
+
+## Crear el administrador
+
+Crea un usuario en Supabase Authentication. El trigger genera su perfil como `customer`. Promuévelo desde SQL Editor:
+
+```sql
+update public.profiles p set role = 'admin'
+from auth.users u
+where p.id = u.id and u.email = 'tu-correo@dominio.com';
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Entra en `/admin/login`. Cada pantalla y acción administrativa valida sesión y rol en servidor; RLS también exige `admin`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Uso
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/admin/productos/nuevo`: crea el producto; al guardar se abre su edición para subir JPG, PNG o WEBP (máximo 6 MB).
+- `/admin/productos`: publicar, ocultar, editar y eliminar.
+- `/admin/categorias`: categorías reales en base de datos.
+- `/admin/configuracion`: marca, WhatsApp, redes, contacto, historia y envíos.
 
-## Learn More
+Un producto publicado aparece automáticamente en `/tienda`. Stock cero deshabilita agregarlo. Al borrar un producto se borran también sus objetos del bucket `products` y las relaciones usan borrado en cascada.
 
-To learn more about Next.js, take a look at the following resources:
+## Base de datos, Storage y seguridad
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Los scripts crean `profiles`, `products`, `categories`, `product_images`, `product_variants`, `orders`, `order_items`, `custom_requests`, `gallery`, `testimonials` y `store_settings`, además de los buckets `products`, `gallery` y `branding`. El público solo lee contenido publicado; solo administradores escriben. La app no usa `service_role`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`seed.sql` agrega nueve categorías y seis productos marcados como DEMO, eliminables desde `/admin`. Sube tus propias fotografías desde el editor.
 
-## Deploy on Vercel
+## WhatsApp
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Guarda el número en `/admin/configuracion`, con código de país y sin `+`. Completa también `NEXT_PUBLIC_WHATSAPP_FALLBACK` para el checkout del carrito. Los mensajes incluyen artículos, cantidades, variantes, total y datos del cliente.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Verificación y Vercel
+
+```bash
+npm run lint
+npm run build
+```
+
+Importa el repositorio en Vercel, agrega las variables de `.env.local` y define `NEXT_PUBLIC_SITE_URL` con el dominio final. Para conectar el dominio usa Project → Settings → Domains y aplica los registros DNS indicados.
+
+## Render
+
+El archivo `render.yaml` define un Web Service Node compatible con SSR y Server Actions. Conecta el repositorio desde **New → Blueprint** en Render y completa las cuatro variables marcadas como secretas. Tras el primer despliegue, actualiza `NEXT_PUBLIC_SITE_URL` con la URL `https://camari.onrender.com` asignada (o el subdominio disponible) y vuelve a desplegar.
+
+## Estructura
+
+- `app/`: rutas públicas, SEO y administrador.
+- `components/`: catálogo, carrito y formularios reutilizables.
+- `lib/`: Supabase, consultas, autorización y utilidades.
+- `types/`: modelos TypeScript.
+- `supabase/`: esquema, RLS, Storage y demo.
+
+Antes de producción reemplaza los datos demo, carga fotos reales y revisa privacidad, términos y envíos según tus condiciones comerciales.
