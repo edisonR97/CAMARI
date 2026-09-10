@@ -1,0 +1,1 @@
+"use client";import{usePathname}from"next/navigation";import{AdminNav}from"./admin-nav";export function AdminShell({children}:{children:React.ReactNode}){const pathname=usePathname();if(pathname==="/admin/login")return <div className="admin-login-shell">{children}</div>;return <div className="admin-shell"><AdminNav/><div className="admin-content">{children}</div></div>}
