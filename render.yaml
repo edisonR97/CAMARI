@@ -13,10 +13,10 @@ services:
       - key: NODE_VERSION
         value: 22.22.0
       - key: NEXT_PUBLIC_SUPABASE_URL
-        sync: false
+        value: https://ovjvrwcvbxblhligghwd.supabase.co
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
-        sync: false
+        value: sb_publishable_J-c_RbCUxFg-cShU0eku5w_AWTex-Li
       - key: NEXT_PUBLIC_SITE_URL
-        sync: false
+        value: https://camari.onrender.com
       - key: NEXT_PUBLIC_WHATSAPP_FALLBACK
         sync: false
